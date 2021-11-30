@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Map Marker</title>
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+  body { margin: 0; padding: 0; }
+  #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  .map-overlay{
+    position: absolute;
+    left: 0;
+    padding: 10px;
+  }
+</style>
+</head>
+<body>
+  
+<div id="map"></div>
+
+<div class="map-overlay top">
+  <button style="font-size: 2em" onclick="move()">Show barns between TCF and SmartPak</button>
+</div>
+<script>
+
+async function run(){
+  const locations = await getBusLocations();
+  console.log(new Date());
+  console.log(locations);
+
+  // timer
+
+  setTimeout(run, 15000);
+
+}
+
+async function getBusLocations(){
+  const url = "https://api-v3.mbta.com/vehicles?filter[route]=1&include=trip";
+  const response = await fetch(url);
+  const json   = await response.json();
+  return json.data;
+}
+
+run();
+</script>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZXF1aXpvdGljIiwiYSI6ImNrd2xiZmhmZzA0b3UydW53OWYwOXU4eTYifQ.GySgy6b-JD8fS6lZ9sD3Cg'
+;
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [-70.5470663305177, 41.858964623495545],
+        zoom: 15
+    });
+    var marker = new mapboxgl.Marker()
+      .setLngLat([-70.54701551753845, 41.85871252432471])
+      .addTo(map);
+
+    var SmartPak = new mapboxgl.Marker()
+      .setLngLat([-70.6889942887596, 41.95907941426565])
+      .addTo(map);
+
+    const barns = [
+        [-70.56954437394174, 41.86376718856201],
+        [-70.62388175695442, 41.87444178457597],
+        [-70.60921494223139, 41.92256214551821],
+        [-70.6514759362323, 41.94128629981337],
+        [-70.66917770658263, 41.96350947284767]
+    ];
+
+    var counter = 0;
+    function move(){
+      setTimeout(() =>{
+          if (counter >= barns.length) return;
+          marker.setLngLat(barns[counter]);
+          counter++;
+          move();
+      }, 1000);
+
+    }
+</script>
+ 
+</body>
+</html>
